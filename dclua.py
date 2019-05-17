@@ -54,3 +54,20 @@ Structure of adjective model is the same as in noun.
 
 
 """
+
+
+class Declensor:
+
+    def __init__(self, vmodel=None, nmodel=None, amodel=None):
+        """Initialize the class and assign vmodel, nmodel and amodel to self.
+
+        Args:
+            vmodel, nmodel, amodel (dict): Declension models. See module
+                description for info.
+
+        """
+
+        self.vmodel = vmodel
+        self.nmodel = nmodel
+        self.amodel = amodel
+
