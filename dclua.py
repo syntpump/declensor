@@ -105,6 +105,36 @@ class Declensor:
             return None
 
         return tuple(
-            _search(
-                model, [], suffix))
+            _search(model, [], suffix))
 
+    def findModel(word, properties, bundle):
+        """Find model of declension of suffix of the given word.
+
+        Args:
+            word (str): Given word.
+            bundle (list): Model of POS (list of models for different
+                suffixes).
+
+        Returns:
+            list: Found model.
+
+        """
+
+        def _getByCoord(array, vector):
+            """Return element from `array` which coordinates was passed by
+            `vector`.
+            """
+
+            if vector:
+                return _getByCoord(
+                    array[vector[0]], vector[1:])
+            else:
+                return array
+
+        for model in bundle:
+            suffix = _getByCoord(model)
+            if word[-len(suffix):] == suffix:
+                return model
+
+        # The edge case.
+        return None
