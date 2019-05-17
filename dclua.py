@@ -71,3 +71,40 @@ class Declensor:
         self.nmodel = nmodel
         self.amodel = amodel
 
+    def getCoordinates(self, suffix: str, model):
+        """Search given suffix in the model and return its coordinates.
+
+        Args:
+            suffix (str): Suffix to look for.
+            model (dict): Model to search in.
+
+        Returns:
+            tuple: Found coordinates.
+
+        """
+
+        def _search(li: list, coords: list, suffix):
+            """Recursive function for searching in list. Each recursion
+            `coords` list increase with new coordinate.
+            Complexity is n^d, where d is dimensionality, but at worst case
+            d=4 with n<10, so that not so much.
+            """
+
+            for index, el in enumerate(li):
+
+                if el == suffix:
+                    return coords + [index]
+
+                if type(el) is list:
+                    found = _search(
+                        el,
+                        coords + [index],
+                        suffix)
+                    if found:
+                        return found
+            return None
+
+        return tuple(
+            _search(
+                model, [], suffix))
+
