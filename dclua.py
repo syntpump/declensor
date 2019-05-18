@@ -71,70 +71,106 @@ class Declensor:
         self.nmodel = nmodel
         self.amodel = amodel
 
-    def getCoordinates(self, suffix: str, model):
-        """Search given suffix in the model and return its coordinates.
+    def findWordInModel(self, word: str, model):
+        """Search suffix of given word in the model and return its coordinates.
 
         Args:
-            suffix (str): Suffix to look for.
+            word (str): Word to look for.
             model (dict): Model to search in.
 
         Returns:
-            tuple: Found coordinates.
+            tuple:
+                [0]: Found suffix.
+                [1]: Coordinates.
 
         """
 
-        def _search(li: list, coords: list, suffix):
+        def _search(li: list, word):
             """Recursive function for searching in list. Each recursion
             `coords` list increase with new coordinate.
             Complexity is n^d, where d is dimensionality, but at worst case
             d=4 with n<10, so that not so much.
+
+            Returns:
+                str: Found suffix.
+
             """
 
             for index, el in enumerate(li):
 
-                if el == suffix:
-                    return coords + [index]
+                if el == word[-len(el):]:
+                    return el
 
                 if type(el) is list:
-                    found = _search(
-                        el,
-                        coords + [index],
-                        suffix)
+                    found = _search(el, word)
                     if found:
                         return found
             return None
 
-        return tuple(
-            _search(model, [], suffix))
+        return _search(model, word)
 
-    def findModel(word, properties, bundle):
+    def findWordInModels(self, word, models):
+        """Search suffix of given word in bundle of models.
+
+        ! This function might cost pretty much.
+        Complexity is m*n^d, where m is number of models, n is an average
+        number of subarrays on each level and d is dimensionality.
+
+        Args:
+            models (iterable): Models to search in.
+            word (str): Word to look for.
+
+        Returns:
+            tuple:
+                [0]: Found suffix.
+                [1]: Model in which it was found.
+
+        """
+
+        for model in models:
+            found = self.findWordInModel(word, model)
+            if found:
+                return found, model
+
+        return None
+
+    def _getByCoord(self, array, vector):
+        """Return element from `array` which coordinates was passed by
+        `vector`.
+
+        Args:
+            array (list): Multidimensional array to search in.
+            vector (list, tuple): Coordinates of element to return.
+
+        Returns:
+            *: Found element.
+
+        """
+        if vector:
+            return self._getByCoord(
+                array[vector[0]], vector[1:])
+        else:
+            return array
+
+    def findModel(self, word, properties, bundle):
         """Find model of declension of suffix of the given word.
 
         Args:
             word (str): Given word.
-            bundle (list): Model of POS (list of models for different
-                suffixes).
+            bundle (iterable): Bundle of models of declension for all suffixes
+                in this POS (list of models for different suffixes).
 
         Returns:
-            list: Found model.
+            tuple:
+                [0]: Recognized suffix.
+                [1]: Found model.
 
         """
 
-        def _getByCoord(array, vector):
-            """Return element from `array` which coordinates was passed by
-            `vector`.
-            """
-
-            if vector:
-                return _getByCoord(
-                    array[vector[0]], vector[1:])
-            else:
-                return array
-
         for model in bundle:
-            suffix = _getByCoord(model)
+            suffix = self._getByCoord(model)
             if word[-len(suffix):] == suffix:
-                return model
+                return suffix, model
 
         # The edge case.
         return None
