@@ -1,6 +1,8 @@
+[![Pypi](https://img.shields.io/pypi/v/dclua.svg)](https://pypi.python.org/pypi/dclua)
+
 # Declensor library
 
-Using this library you can train declension models and declense words. This will just replace suffix of the word to correspond new morphological properties you want the word to have. Here's some topics that will help you understand how it works.
+Using `dclua.py` library you can train declension models and declense words. This will just replace suffix of the word to correspond new morphological properties you want the word to have. Here's some topics that will help you understand how it works.
 
 ## Morphological vector
 Morphological vector is a vector which determines morphology properties for the lexeme. Number on each coordinate determine some property. You can use your vectors for your language, but here's the structure, which is suggested to use for Ukrainian.
