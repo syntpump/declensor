@@ -170,6 +170,8 @@ class Declensor:
 
         Args:
             word (str): Given word.
+            properties (tuple, list): Coordinates to look for suffix of
+                given form.
             bundle (iterable): Bundle of models of declension for all suffixes
                 in this POS (list of models for different suffixes).
 
@@ -181,7 +183,7 @@ class Declensor:
         """
 
         for model in bundle:
-            suffix = self.getByCoord(model)
+            suffix = self.getByCoord(model, properties)
             if word[-len(suffix):] == suffix:
                 return suffix, model
 
@@ -242,7 +244,7 @@ class NoModelFound(Exception):
 
 class DeclenseTrainer:
 
-    @ staticmethod
+    @staticmethod
     def _getRootSize(words):
         """Returns the size of unchangeable part of the words in array.
 
