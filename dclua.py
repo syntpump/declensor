@@ -13,7 +13,7 @@ Example:
 | c | d |  'a' is an infinitive suffix.
 ---------
 
-Structure of verbs model by coordinates:
+Suggested structure of verbs model by coordinates:
     1: tense
         [0] - infinitive
         [1] - present
@@ -33,7 +33,7 @@ Structure of verbs model by coordinates:
     Infinitive suffix can be found at [0][0][0][0]
     Full size of this model is 4*3*2*3 = 72
 
-Structure of adjective model:
+Suggested structure of adjective model:
     1: gender
         [1] - masculine
         [2] - feminine
@@ -48,7 +48,7 @@ Structure of adjective model:
     Infinitive form at [0][0][0]
     Full size of this model is 3*2*3 = 18
 
-Structure of noun model:
+Suggested structure of noun model:
     1: number
         [1] - singular
         [2] - plural
@@ -70,19 +70,6 @@ class Declensor:
     """Declensor class take declension models and give you functions to
     declense words.
     """
-
-    def __init__(self, vmodel=None, nmodel=None, amodel=None):
-        """Initialize the class and assign vmodel, nmodel and amodel to self.
-
-        Args:
-            vmodel, nmodel, amodel (dict): Declension models. See module
-                description for info.
-
-        """
-
-        self.vmodel = vmodel
-        self.nmodel = nmodel
-        self.amodel = amodel
 
     def _findWordInModel(self, word: str, model):
         """Search suffix of given word in the model and return its coordinates.
