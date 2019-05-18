@@ -72,6 +72,8 @@ model[2][6] == 'ки'
 
 Every word has its suffix, so you need to create models for each of them in order to use in the future.
 
+`getModel` method also accept `minsize` argument, which determine size of the minimal producing suffix.
+
 ## Word declension
 Once you have bundle of models for different suffixes, you can use them to declense words. The syntax is following:
 ```

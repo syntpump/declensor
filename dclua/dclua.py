@@ -274,7 +274,7 @@ class DeclenseTrainer:
         return len(comparator)
 
     @staticmethod
-    def getModel(declensions):
+    def getModel(declensions, minsize=2):
         """Produce the declension model for given word.
 
         Args:
@@ -282,6 +282,7 @@ class DeclenseTrainer:
                 key (tuple): Morphology vector for given form. See docstring of
                     this module for details.
                 value (str): Form of the word.
+            minsize (int): Minimal size of the suffix.
 
         Returns:
             list: Produced model.
@@ -319,6 +320,14 @@ class DeclenseTrainer:
         model = list()
 
         for vector, form in declensions.items():
-            _insertInto(model, form[rootSize:], *vector)
+            declensed = form[rootSize:]
+            # If producing suffixes are smaller than minsize, size of the root
+            # will be decreased.
+            diff = minsize - len(declensed)
+            if diff > 0:
+                rootSize -= diff
+                # Reproduce suffix again,
+                declensed = form[rootSize:]
+            _insertInto(model, declensed, *vector)
 
         return model

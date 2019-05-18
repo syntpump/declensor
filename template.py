@@ -127,10 +127,10 @@ adjective = {
     # Neutral, singular, second
     (3, 0, 1): '',
 
-    # Neutral, singular, third
+    # Masculine, singular, third
     (1, 0, 2): '',
 
-    # Neutral, singular, third
+    # Feminine, singular, third
     (2, 0, 2): '',
 
     # Neutral, singular, third
@@ -140,11 +140,11 @@ adjective = {
     # Neutral, plural, first
     (3, 1, 0): '',
 
-    # Neutral, plural, first
-    (3, 1, 0): '',
+    # Neutral, plural, second
+    (3, 1, 1): '',
 
-    # Neutral, plural, first
-    (3, 1, 0): '',
+    # Neutral, plural, third
+    (3, 1, 2): '',
 
     # Adjectives in first do not have gender. Push it to "neutral".
     # Neutral, singular, first
