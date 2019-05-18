@@ -317,17 +317,15 @@ class DeclenseTrainer:
 
         rootSize = DeclenseTrainer._getRootSize(declensions.values())
 
+        # Decrease rootSize, when suffixes are less than minsize
+        for word in declensions.values():
+            diff = minsize - len(word[rootSize:])
+            if diff > 0:
+                rootSize -= diff
+
         model = list()
 
         for vector, form in declensions.items():
-            declensed = form[rootSize:]
-            # If producing suffixes are smaller than minsize, size of the root
-            # will be decreased.
-            diff = minsize - len(declensed)
-            if diff > 0:
-                rootSize -= diff
-                # Reproduce suffix again,
-                declensed = form[rootSize:]
-            _insertInto(model, declensed, *vector)
+            _insertInto(model, form[rootSize:], *vector)
 
         return model
