@@ -98,6 +98,9 @@ class Declensor:
 
             for index, el in enumerate(li):
 
+                if not el:
+                    continue
+
                 if el == word[-len(el):]:
                     return el
 
@@ -220,7 +223,7 @@ class Declensor:
 
         # This variable will raise up from the condition above.
         if not model:
-            raise NoModelFound
+            raise NoModelFound("No appropriate model for this form found.")
 
         return self._changeProperties(word, *model, newmorph)
 
