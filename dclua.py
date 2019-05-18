@@ -57,6 +57,9 @@ Structure of adjective model is the same as in noun.
 
 
 class Declensor:
+    """Declensor class take declension models and give you functions to
+    declense words.
+    """
 
     def __init__(self, vmodel=None, nmodel=None, amodel=None):
         """Initialize the class and assign vmodel, nmodel and amodel to self.
@@ -174,3 +177,55 @@ class Declensor:
 
         # The edge case.
         return None
+
+    def changeProperties(self, word, suffix, model, properties):
+        """Replace the suffix of the word with the new one.
+
+        Args:
+            word (str): Given word.
+            suffix (str): Suffix to replace.
+            model (list): Model of declension for this suffix.
+            properties (list, tuple): Coordinates of new suffix.
+
+        Returns:
+            str: Result.
+
+        """
+
+        return word[:-len(suffix)] + self._getByCoord(model, properties)
+
+    def declense(self, word, newmorph, models, morphology=None):
+        """Declense word with given `morphology` to `newmorph` which determines
+        new morphology. If the morphology was not given, it will be found
+        in the models anyway.
+
+        ! Finding appropriate declension model through models is a little bit
+        expensive procedure, so if you know the morphology of passing word,
+        it's better to cal this function with `morphology`.
+
+        Args:
+            word (str): Given word.
+            morphology (list/tuple): Old morphology coordinates.
+            newmorph (list/tuple): New morphology coordinates.
+            models (iterable): Bundle of models of declensions for POS of word.
+
+        Returns:
+            str: Result.
+
+        """
+
+        if not morphology:
+            model = self.findWordInModels(word, models)
+        else:
+            model = self.findModel(word, morphology, models)
+
+        # This variable will raise up from the condition above.
+        if not model:
+            raise NoModelFound
+
+        return self.changeProperties(word, *model, newmorph)
+
+
+class NoModelFound(Exception):
+    pass
+
