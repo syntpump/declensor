@@ -89,3 +89,6 @@ The morphology vector of given word will be recognized automatically, so it may 
 >>> dcl.declense('сонцю', (1,1), models, morphology=(1,2))
 <<< 'сонця'
 ```
+
+## Train your model
+In order to train your model you can use template from `template.txt`.
