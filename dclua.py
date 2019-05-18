@@ -31,8 +31,9 @@ Structure of verbs model by coordinates:
         [..][..][..][1] - feminine
         [..][..][..][2] - neutral
     Infinitive suffix can be found at [0][0][0][0]
+    Full size of this model is 4*3*2*3 = 72
 
-Structure of noun model:
+Structure of adjective model:
     1: gender
         [1] - masculine
         [2] - feminine
@@ -40,7 +41,18 @@ Structure of noun model:
     2: number
         [0] - singular
         [1] - plural
-    3: case
+    3: person
+        [0] - first
+        [1] - second
+        [2] - third
+    Infinitive form at [0][0][0]
+    Full size of this model is 3*2*3 = 18
+
+Structure of noun model:
+    1: number
+        [1] - singular
+        [2] - plural
+    2: case
         [0] - nominative
         [1] - genitive
         [2] - dative
@@ -48,10 +60,8 @@ Structure of noun model:
         [4] - instrumental
         [5] - locative
         [6] - vocative
-    Infinitive form at [0][0][0]
-
-Structure of adjective model is the same as in noun.
-
+    Infinitive form at [0][0]
+    Full size of this model is 2*7 = 14
 
 """
 
@@ -74,7 +84,7 @@ class Declensor:
         self.nmodel = nmodel
         self.amodel = amodel
 
-    def findWordInModel(self, word: str, model):
+    def _findWordInModel(self, word: str, model):
         """Search suffix of given word in the model and return its coordinates.
 
         Args:
@@ -112,7 +122,7 @@ class Declensor:
 
         return _search(model, word)
 
-    def findWordInModels(self, word, models):
+    def _findWordInModels(self, word, models):
         """Search suffix of given word in bundle of models.
 
         ! This function might cost pretty much.
@@ -131,13 +141,13 @@ class Declensor:
         """
 
         for model in models:
-            found = self.findWordInModel(word, model)
+            found = self._findWordInModel(word, model)
             if found:
                 return found, model
 
         return None
 
-    def _getByCoord(self, array, vector):
+    def getByCoord(self, array, vector):
         """Return element from `array` which coordinates was passed by
         `vector`.
 
@@ -150,12 +160,12 @@ class Declensor:
 
         """
         if vector:
-            return self._getByCoord(
+            return self.getByCoord(
                 array[vector[0]], vector[1:])
         else:
             return array
 
-    def findModel(self, word, properties, bundle):
+    def _findModel(self, word, properties, bundle):
         """Find model of declension of suffix of the given word.
 
         Args:
@@ -171,14 +181,14 @@ class Declensor:
         """
 
         for model in bundle:
-            suffix = self._getByCoord(model)
+            suffix = self.getByCoord(model)
             if word[-len(suffix):] == suffix:
                 return suffix, model
 
         # The edge case.
         return None
 
-    def changeProperties(self, word, suffix, model, properties):
+    def _changeProperties(self, word, suffix, model, properties):
         """Replace the suffix of the word with the new one.
 
         Args:
@@ -192,9 +202,9 @@ class Declensor:
 
         """
 
-        return word[:-len(suffix)] + self._getByCoord(model, properties)
+        return word[:-len(suffix)] + self.getByCoord(model, properties)
 
-    def declense(self, word, newmorph, models, morphology=None):
+    def declense(self, word, newmorph, models, morphology=None) -> str:
         """Declense word with given `morphology` to `newmorph` which determines
         new morphology. If the morphology was not given, it will be found
         in the models anyway.
@@ -215,15 +225,15 @@ class Declensor:
         """
 
         if not morphology:
-            model = self.findWordInModels(word, models)
+            model = self._findWordInModels(word, models)
         else:
-            model = self.findModel(word, morphology, models)
+            model = self._findModel(word, morphology, models)
 
         # This variable will raise up from the condition above.
         if not model:
             raise NoModelFound
 
-        return self.changeProperties(word, *model, newmorph)
+        return self._changeProperties(word, *model, newmorph)
 
 
 class NoModelFound(Exception):
