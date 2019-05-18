@@ -239,3 +239,94 @@ class Declensor:
 class NoModelFound(Exception):
     pass
 
+
+class DeclenseTrainer:
+
+    @ staticmethod
+    def _getRootSize(words):
+        """Returns the size of unchangeable part of the words in array.
+
+        Args:
+            words (iterable)
+
+        Returns:
+            int: Size of the part.
+
+        """
+
+        def _compareTwo(word1, word2) -> int:
+            """Returns the size of common part of two words.
+            """
+
+            counter = 0
+            for a, b in zip(word1, word2):
+                if a == b:
+                    counter += 1
+                else:
+                    break
+
+            return counter
+
+        comparator = None
+
+        for word in words:
+
+            # Remember and skip the first word.
+            if not comparator:
+                comparator = word
+                continue
+
+            # Remember the common part
+            comparator = word[:_compareTwo(word, comparator)]
+
+        return len(comparator)
+
+    @staticmethod
+    def getModel(declensions):
+        """Produce the declension model for given word.
+
+        Args:
+            declensions (dict):
+                key (tuple): Morphology vector for given form. See docstring of
+                    this module for details.
+                value (str): Form of the word.
+
+        Returns:
+            list: Produced model.
+
+        """
+
+        def _enlargeList(array, index):
+            """Enlarge array, so it will contain given index. Fill the gaps
+            with None.
+            """
+
+            while len(array) <= index:
+                array.append(None)
+
+            if array[index] is None:
+                array[index] = []
+
+        def _insertInto(array, value, index, *vector):
+            """Insert `value` into given `array` into some coordinates. Example
+            of use:
+            >>> _insertInto([], "!", 0, 0, 1)
+            <<< [[[None, "!"]]]
+            """
+
+            _enlargeList(array, index)
+
+            if not vector:
+                array[index] = value
+
+            else:
+                _insertInto(array[index], value, *vector)
+
+        rootSize = DeclenseTrainer._getRootSize(declensions.values())
+
+        model = list()
+
+        for vector, form in declensions.items():
+            _insertInto(model, form[rootSize:], *vector)
+
+        return model
