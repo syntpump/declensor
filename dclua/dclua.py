@@ -149,9 +149,13 @@ class Declensor:
             *: Found element.
 
         """
-        if vector:
-            return self.getByCoord(
-                array[vector[0]], vector[1:])
+
+        if vector and type(array) is list:
+            try:
+                return self.getByCoord(
+                    array[vector[0]], vector[1:])
+            except IndexError:
+                return None
         else:
             return array
 
@@ -174,6 +178,10 @@ class Declensor:
 
         for model in bundle:
             suffix = self.getByCoord(model, properties)
+
+            if not suffix:
+                return None
+
             if word[-len(suffix):] == suffix:
                 return suffix, model
 
@@ -193,6 +201,11 @@ class Declensor:
             str: Result.
 
         """
+
+        newsuffix = self.getByCoord(model, properties)
+
+        if not suffix or not newsuffix:
+            return word
 
         return word[:-len(suffix)] + self.getByCoord(model, properties)
 
