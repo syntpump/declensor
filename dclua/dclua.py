@@ -106,6 +106,36 @@ class Declensor:
             reverse=True
         )
 
+    def _fitOrthography(self, word):
+        """Fix some orthography mistakes, which can happen after declension.
+
+        Args:
+            word (str)
+
+        Returns:
+            str
+
+        """
+
+        replacements = [
+            # йа -> я, йі -> ї, йу -> ю, йе -> є.
+            ('\u0439\u0430', '\u044f'),
+            ('\u0439\u0456', '\u0457'),
+            ('\u0439\u0443', '\u044e'),
+            ('\u0439\u0435', '\u0454'),
+
+            # ьа -> я, ьі -> і, ьу -> ю, ье -> є
+            ('\u044c\u0430', '\u044f'),
+            ('\u044c\u0456', '\u0456'),
+            ('\u044c\u0443', '\u044e'),
+            ('\u044c\u0435', '\u0454')
+        ]
+
+        for old, new in replacements:
+            word = word.replace(old, new)
+
+        return word
+
     def _findWordInModel(self, word: str, model):
         """Search suffix of given word in the model and return its coordinates.
 
@@ -269,7 +299,8 @@ class Declensor:
         if not model:
             raise NoModelFound("No appropriate model for this form found.")
 
-        return self._changeProperties(word, *model, newmorph)
+        return self._fitOrthography(
+            self._changeProperties(word, *model, newmorph))
 
 
 class NoModelFound(Exception):
