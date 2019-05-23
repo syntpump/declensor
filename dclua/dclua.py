@@ -81,6 +81,17 @@ class Declensor:
 
         self.setModels(models)
 
+    @staticmethod
+    def getZero(li: list):
+        """Returns zero-coordinate of `li`. This method is static in order to
+        use it in DeclenseTrainer.
+        """
+
+        if type(li) is list:
+            return Declensor.getZero(li[0])
+        else:
+            return li
+
     def setModels(self, models):
         """Set given iterable of models as the working one. Do not assign your
         models to Declensor.models without this function, because they should
@@ -91,18 +102,9 @@ class Declensor:
 
         """
 
-        def _dive(li):
-            """Returns zero-coordinate of `li`.
-            """
-
-            if type(li) is list:
-                return _dive(li[0])
-            else:
-                return li
-
         self.models = sorted(
             models,
-            key=lambda model: len(_dive(model)),
+            key=lambda model: len(Declensor.getZero(model)),
             reverse=True
         )
 
@@ -309,6 +311,15 @@ class NoModelFound(Exception):
 
 class DeclenseTrainer:
 
+    GROUPS = [
+        list("мвнлрй"),
+        list("дзжгґб"),
+        list("птсцшчпкхф"),
+        list("аіуео"),
+        list("яїюєь"),
+        list("шчщс")
+    ]
+
     @staticmethod
     def _getRootSize(words):
         """Returns the size of unchangeable part of the words in array.
@@ -468,3 +479,69 @@ class DeclenseTrainer:
                 _putRecursively(letter, index, rule[:])
                 for letter in group
             ]
+
+        def _deleteGroup(array, group, index):
+            """Delete all group members from a given array.
+
+            Args:
+                array (iterable)
+                group (list)
+                index (int): An index of letter to be compared with the group's
+                    one.
+
+            """
+
+            result = list()
+            deleted = None
+            counter = 0
+
+            for rule in array:
+                try:
+                    if Declensor.getZero(rule)[index] not in group:
+                        result.append(rule)
+                        counter += 1
+                    else:
+                        deleted = rule
+                except IndexError:
+                    continue
+
+            return result, counter, deleted
+
+        def _rulesAreIdentical(a, b, index):
+            """Check whether two groups are determine the same suffix (without)
+            given index.
+            """
+            if type(a) is type(b) is not list:
+                return a[:index] + a[index + 1:] == b[:index] + b[index + 1:]
+
+            return all(
+                _rulesAreIdentical(group1, group2, index)
+                for group1, group2 in
+                zip(a, b)
+            )
+
+        # Array of lengths of infinitive suffixes.
+        lengths = [
+            len(
+                Declensor.getZero(
+                    rule))
+            for rule in model
+        ]
+
+        # Generalized groups will be stored here and added to `model` in
+        # the end.
+        extended = list()
+
+        for group in groups:
+
+            for index in range(0, max(lengths) + 1):
+
+                reduced, counter, element = _deleteGroup(model, group, index)
+
+                if counter < len(group) * threshold or not element:
+                    continue
+
+                extended.append(_generalize(element, index, group))
+                model = reduced
+
+        return model + extended
