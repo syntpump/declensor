@@ -71,12 +71,47 @@ class Declensor:
     declense words.
     """
 
+    def __init__(self, models):
+        """Initialize Declensor with the given models.
+
+        Args:
+            models (iterable)
+
+        """
+
+        self.setModels(models)
+
+    def setModels(self, models):
+        """Set given iterable of models as the working one. Do not assign your
+        models to Declensor.models without this function, because they should
+        be sorted in a specific way before use.
+
+        Args:
+            models (iterable)
+
+        """
+
+        def _dive(li):
+            """Returns zero-coordinate of `li`.
+            """
+
+            if type(li) is list:
+                return _dive(li[0])
+            else:
+                return li
+
+        self.models = sorted(
+            models,
+            key=lambda model: len(_dive(model)),
+            reverse=True
+        )
+
     def _findWordInModel(self, word: str, model):
         """Search suffix of given word in the model and return its coordinates.
 
         Args:
             word (str): Word to look for.
-            model (dict): Model to search in.
+            model (list): Model to search in.
 
         Returns:
             tuple:
@@ -112,7 +147,7 @@ class Declensor:
 
         return _search(model, word)
 
-    def _findWordInModels(self, word, models):
+    def _findWordInModels(self, word):
         """Search suffix of given word in bundle of models.
 
         ! This function might cost pretty much.
@@ -120,7 +155,6 @@ class Declensor:
         number of subarrays on each level and d is dimensionality.
 
         Args:
-            models (iterable): Models to search in.
             word (str): Word to look for.
 
         Returns:
@@ -130,7 +164,7 @@ class Declensor:
 
         """
 
-        for model in models:
+        for model in self.models:
             found = self._findWordInModel(word, model)
             if found:
                 return found, model
@@ -159,15 +193,13 @@ class Declensor:
         else:
             return array
 
-    def _findModel(self, word, properties, bundle):
+    def _findModel(self, word, properties):
         """Find model of declension of suffix of the given word.
 
         Args:
             word (str): Given word.
             properties (tuple, list): Coordinates to look for suffix of
                 given form.
-            bundle (iterable): Bundle of models of declension for all suffixes
-                in this POS (list of models for different suffixes).
 
         Returns:
             tuple:
@@ -176,7 +208,7 @@ class Declensor:
 
         """
 
-        for model in bundle:
+        for model in self.models:
             suffix = self.getByCoord(model, properties)
 
             if not suffix:
@@ -209,7 +241,7 @@ class Declensor:
 
         return word[:-len(suffix)] + self.getByCoord(model, properties)
 
-    def declense(self, word, newmorph, models, morphology=None) -> str:
+    def declense(self, word, newmorph, morphology=None) -> str:
         """Declense word with given `morphology` to `newmorph` which determines
         new morphology. If the morphology was not given, it will be found
         in the models anyway.
@@ -222,7 +254,6 @@ class Declensor:
             word (str): Given word.
             morphology (list/tuple): Old morphology coordinates.
             newmorph (list/tuple): New morphology coordinates.
-            models (iterable): Bundle of models of declensions for POS of word.
 
         Returns:
             str: Result.
@@ -230,9 +261,9 @@ class Declensor:
         """
 
         if not morphology:
-            model = self._findWordInModels(word, models)
+            model = self._findWordInModels(word)
         else:
-            model = self._findModel(word, morphology, models)
+            model = self._findModel(word, morphology)
 
         # This variable will raise up from the condition above.
         if not model:
