@@ -497,7 +497,11 @@ class DeclenseTrainer:
 
             for rule in array:
                 try:
-                    if Declensor.getZero(rule)[index] not in group:
+                    if (
+                        Declensor.getZero(rule)[index] not in group or
+                        not deleted or
+                        not _rulesAreIdentical(deleted, rule, index)
+                    ):
                         result.append(rule)
                         counter += 1
                     else:
