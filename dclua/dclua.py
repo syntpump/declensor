@@ -349,7 +349,7 @@ class DeclenseTrainer:
         return len(comparator)
 
     @staticmethod
-    def getModel(declensions, minsize=2):
+    def analyze(declensions, minsize=2):
         """Produce the declension model for given word.
 
         Args:
@@ -404,3 +404,67 @@ class DeclenseTrainer:
             _insertInto(model, form[rootSize:], *vector)
 
         return model
+
+    @staticmethod
+    def createModel(words, minsize=2):
+        """Syntactic sugar for `analyze` method. Works just the same, but with
+        the list of words.
+        """
+
+        return [DeclenseTrainer.analyze(word, minsize) for word in words]
+
+    @staticmethod
+    def generalizeModel(model, groups: list, threshold=.3):
+        """Try to generalize your model to groups of given letters.
+
+        For example, suppose we have groups of vowels and consonants.
+        Now, if there are rules for suffix 'baa', 'caa', 'daa' and they produce
+        the same sequence ('bara', 'cara', 'dara', etc.), we can consider, that
+        the same rule will be the truth for all consonants: 'faa', 'gaa' and so
+        on.
+
+        You can give as many groups of letters as you want. It depends on the
+        morphology rules of the words you're going to make model for.
+
+        Args:
+            model (list)
+            groups (iterable)
+            threshold (float): Minimal ratio of number of letters in the group
+                and number of rules, which can be generalized to that group.
+                For example, if there are 15 letters in the group, at least 5
+                rules (when threshold=.3) should be considered as they belong
+                to that group.
+
+        Returns:
+            list: Produced model.
+
+        """
+
+        def _generalize(rule, index, group) -> list:
+            """Returns a list of rules generalized to a given group.
+
+            Args:
+                index (int): Index of the letter which will be generalized.
+                    >>> _generalize(
+                            ['abc', ...],
+                            index=1,
+                            group=['b', 'w', 'v'])
+                    <<< [['abc', ...], ['awc', ...], [avc, ...]]
+
+            """
+
+            def _putRecursively(l, index, array):
+                """Goes through array recursively and put a given letter `l`
+                onto given `index`, if element is a string.
+                """
+                for i, el in enumerate(array):
+                    if type(el) is str:
+                        array[i] = el[:index] + l + el[index + 1:]
+                    else:
+                        array[i] = _putRecursively(l, index, el)
+                return array
+
+            return [
+                _putRecursively(letter, index, rule[:])
+                for letter in group
+            ]
