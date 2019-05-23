@@ -201,7 +201,7 @@ class Declensor:
 
         return None
 
-    def getByCoord(self, array, vector):
+    def _getByCoord(self, array, vector):
         """Return element from `array` which coordinates was passed by
         `vector`.
 
@@ -216,7 +216,7 @@ class Declensor:
 
         if vector and type(array) is list:
             try:
-                return self.getByCoord(
+                return self._getByCoord(
                     array[vector[0]], vector[1:])
             except IndexError:
                 return None
@@ -239,7 +239,7 @@ class Declensor:
         """
 
         for model in self.models:
-            suffix = self.getByCoord(model, properties)
+            suffix = self._getByCoord(model, properties)
 
             if not suffix:
                 return None
@@ -264,12 +264,12 @@ class Declensor:
 
         """
 
-        newsuffix = self.getByCoord(model, properties)
+        newsuffix = self._getByCoord(model, properties)
 
         if not suffix or not newsuffix:
             return word
 
-        return word[:-len(suffix)] + self.getByCoord(model, properties)
+        return word[:-len(suffix)] + self._getByCoord(model, properties)
 
     def declense(self, word, newmorph, morphology=None) -> str:
         """Declense word with given `morphology` to `newmorph` which determines
