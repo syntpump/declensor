@@ -169,7 +169,8 @@ class Declensor:
 
             for index, el in enumerate(li):
 
-                if not el:
+                # Do not allow to declense whole words as suffixes
+                if not el or len(el) == len(word):
                     continue
 
                 if el == word[-len(el):]:
