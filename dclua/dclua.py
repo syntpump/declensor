@@ -1,8 +1,6 @@
 """This module contains class Declensor which allow you to use declension
 model.
-This class should be initialized optionally with model for verbs (vmodel),
-nouns (nmodel) and adjectives (amodel).
-The model is a list of multidimensional lists with declensed suffixes.
+The model is a list of multidimensional lists (rules) with declensed suffixes.
 Properties for declension are given by coordinates. Suffix for infinitive form
 should always be placed with zero coordinates.
 
@@ -69,19 +67,19 @@ from copy import deepcopy
 
 
 class Declensor:
-    """Declensor class take declension models and give you functions to
-    declense words.
+    """Declensor class take declension model and give you functions to
+    for declension.
     """
 
-    def __init__(self, models):
-        """Initialize Declensor with the given models.
+    def __init__(self, rules):
+        """Initialize Declensor with the given rules.
 
         Args:
-            models (iterable)
+            rules (iterable)
 
         """
 
-        self.setModels(models)
+        self.setModel(rules)
 
     @staticmethod
     def getZero(li: list):
@@ -94,18 +92,18 @@ class Declensor:
         else:
             return li
 
-    def setModels(self, models):
-        """Set given iterable of models as the working one. Do not assign your
-        models to Declensor.models without this function, because they should
+    def setModel(self, rules):
+        """Set given iterable of rules as the working one. Do not assign your
+        rules to Declensor.rules without this function, because they should
         be sorted in a specific way before use.
 
         Args:
-            models (iterable)
+            rules (iterable)
 
         """
 
-        self.models = sorted(
-            models,
+        self.rules = sorted(
+            rules,
             key=lambda model: len(Declensor.getZero(model)),
             reverse=True
         )
@@ -141,12 +139,12 @@ class Declensor:
 
         return word
 
-    def _findWordInModel(self, word: str, model):
-        """Search suffix of given word in the model and return its coordinates.
+    def _findInRule(self, word: str, rule):
+        """Search suffix of given word in the rule and return its coordinates.
 
         Args:
             word (str): Word to look for.
-            model (list): Model to search in.
+            rule (list): Rule to search in.
 
         Returns:
             tuple:
@@ -180,13 +178,13 @@ class Declensor:
                         return found
             return None
 
-        return _search(model, word)
+        return _search(rule, word)
 
-    def _findWordInModels(self, word):
-        """Search suffix of given word in bundle of models.
+    def _findWordInModel(self, word):
+        """Search suffix of given word in bundle of rules.
 
         ! This function might cost pretty much.
-        Complexity is m*n^d, where m is number of models, n is an average
+        Complexity is m*n^d, where m is number of rules, n is an average
         number of subarrays on each level and d is dimensionality.
 
         Args:
@@ -195,14 +193,14 @@ class Declensor:
         Returns:
             tuple:
                 [0]: Found suffix.
-                [1]: Model in which it was found.
+                [1]: Rule in which it was found.
 
         """
 
-        for model in self.models:
-            found = self._findWordInModel(word, model)
+        for rule in self.rules:
+            found = self._findInRule(word, rule)
             if found:
-                return found, model
+                return found, rule
 
         return None
 
@@ -228,8 +226,8 @@ class Declensor:
         else:
             return array
 
-    def _findModel(self, word, properties):
-        """Find model of declension of suffix of the given word.
+    def _findRule(self, word, properties):
+        """Find rule of declension of suffix of the given word.
 
         Args:
             word (str): Given word.
@@ -239,29 +237,29 @@ class Declensor:
         Returns:
             tuple:
                 [0]: Recognized suffix.
-                [1]: Found model.
+                [1]: Found rule.
 
         """
 
-        for model in self.models:
-            suffix = self._getByCoord(model, properties)
+        for rule in self.rules:
+            suffix = self._getByCoord(rule, properties)
 
             if not suffix:
                 return None
 
             if word[-len(suffix):] == suffix:
-                return suffix, model
+                return suffix, rule
 
         # The edge case.
         return None
 
-    def _changeProperties(self, word, suffix, model, properties):
+    def _changeProperties(self, word, suffix, rule, properties):
         """Replace the suffix of the word with the new one.
 
         Args:
             word (str): Given word.
             suffix (str): Suffix to replace.
-            model (list): Model of declension for this suffix.
+            rule (list): Rule of declension for this suffix.
             properties (list, tuple): Coordinates of new suffix.
 
         Returns:
@@ -269,19 +267,19 @@ class Declensor:
 
         """
 
-        newsuffix = self._getByCoord(model, properties)
+        newsuffix = self._getByCoord(rule, properties)
 
         if not suffix or not newsuffix:
             return word
 
-        return word[:-len(suffix)] + self._getByCoord(model, properties)
+        return word[:-len(suffix)] + self._getByCoord(rule, properties)
 
     def declense(self, word, newmorph, morphology=None) -> str:
         """Declense word with given `morphology` to `newmorph` which determines
         new morphology. If the morphology was not given, it will be found
-        in the models anyway.
+        in the model anyway.
 
-        ! Finding appropriate declension model through models is a little bit
+        ! Finding appropriate declension rule in model is a little bit
         expensive procedure, so if you know the morphology of passing word,
         it's better to cal this function with `morphology`.
 
@@ -296,19 +294,19 @@ class Declensor:
         """
 
         if not morphology:
-            model = self._findWordInModels(word)
+            rule = self._findWordInModel(word)
         else:
-            model = self._findModel(word, morphology)
+            rule = self._findRule(word, morphology)
 
         # This variable will raise up from the condition above.
-        if not model:
-            raise NoModelFound("No appropriate model for this form found.")
+        if not rule:
+            raise ModelError("No appropriate rule for this form found.")
 
         return Declensor._fitOrthography(
-            self._changeProperties(word, *model, newmorph))
+            self._changeProperties(word, *rule, newmorph))
 
 
-class NoModelFound(Exception):
+class ModelError(Exception):
     pass
 
 
