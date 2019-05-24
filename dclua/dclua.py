@@ -32,19 +32,22 @@ Suggested structure of verbs model by coordinates:
     Full size of this model is 4*3*2*3 = 72
 
 Suggested structure of adjective model:
-    1: gender
-        [1] - masculine
-        [2] - feminine
-        [3] - neutral
+    1: case
+        [1] - nominative
+        [2] - genitive
+        [3] - dative
+        [4] - accusative
+        [5] - instrumental
+        [6] - locative
     2: number
         [0] - singular
         [1] - plural
-    3: person
-        [0] - first
-        [1] - second
-        [2] - third
+    3: gender
+        [0] - masculine
+        [1] - feminine
+        [2] - neutral
     Infinitive form at [0][0][0]
-    Full size of this model is 3*2*3 = 18
+    Full size of this model is 6*2*3 = 36
 
 Suggested structure of noun model:
     1: number

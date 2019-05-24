@@ -50,7 +50,7 @@ Infinitive suffix placed at `[0][0][0]`.
 Declension rule is a multidimensional array which contains declensed suffixes, which is indexed using [morphology vectors](#morphological-vector). You can create such model for your word in this way:
 
 ```python
-rule = dclua.DeclenseTrainer.getRule({
+rule = dclua.DeclenseTrainer.analyze({
   (0,0): 'усмішка',
   (1,0): 'усмішка',
   (1,1): 'усмішки',
@@ -72,7 +72,7 @@ rule[2][6] == 'ки'
 
 Every word has its suffix, so you need to create rule for each of them in order to use in the future.
 
-`getRule` method also accept `minsize` argument, which determine size of the minimal producing suffix.
+`analyze` method also accept `minsize` argument, which determine size of the minimal producing suffix.
 
 ## Word declension
 Once you have model (bundle of rules) for different suffixes, you can use them to decline words. The syntax is following:

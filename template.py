@@ -124,31 +124,78 @@ adjective = {
     # Infinitive
     (0, 0, 0): '',
 
-    # Neutral, singular, second
-    (3, 0, 1): '',
+    # Nominative, singular, masculine
+    (1, 0, 0): '',
 
-    # Masculine, singular, third
+    # Nominative, singular, feminine
+    (1, 0, 1): '',
+
+    # Nominative, singular, neutral
     (1, 0, 2): '',
 
-    # Feminine, singular, third
+    # Genitive, singular, masculine
+    (2, 0, 0): '',
+
+    # Genitive, singular, feminine
+    (2, 0, 1): '',
+
+    # Genitive, singular, neutral
     (2, 0, 2): '',
 
-    # Neutral, singular, third
+    # Dative, singular, masculine
+    (3, 0, 0): '',
+
+    # Dative, singular, feminine
+    (3, 0, 1): '',
+
+    # Dative, singular, neutral
     (3, 0, 2): '',
 
-    # Adjectives in plural do not have gender. Push it to "neutral".
-    # Neutral, plural, first
+    # Accusative, singular, masculine
+    (4, 0, 0): '',
+
+    # Accusative, singular, feminine
+    (4, 0, 1): '',
+
+    # Accusative, singular, neutral
+    (4, 0, 2): '',
+
+    # Instrumental, singular, masculine
+    (5, 0, 0): '',
+
+    # Instrumental, singular, feminine
+    (5, 0, 1): '',
+
+    # Instrumental, singular, neutral
+    (5, 0, 2): '',
+
+    # Locative, singular, masculine
+    (6, 0, 0): '',
+
+    # Locative, singular, feminine
+    (6, 0, 1): '',
+
+    # Locative, singular, neutral
+    (6, 0, 2): '',
+
+    # Adjectives in plural do not have gender, put it to `neutral`
+    # Nominative, plural, neutral
+    (1, 1, 0): '',
+
+    # Genitive, plural, neutral
+    (2, 1, 0): '',
+
+    # Dative, plural, neutral
     (3, 1, 0): '',
 
-    # Neutral, plural, second
-    (3, 1, 1): '',
+    # Accusative, plural, neutral
+    (4, 1, 0): '',
 
-    # Neutral, plural, third
-    (3, 1, 2): '',
+    # Instrumental, plural, neutral
+    (5, 1, 0): '',
 
-    # Adjectives in first do not have gender. Push it to "neutral".
-    # Neutral, singular, first
-    (3, 0, 0): '',
+    # Locative, plural, neutral
+    (6, 1, 0): ''
 }
 
 # Paste here your dict
