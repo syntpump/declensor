@@ -110,7 +110,8 @@ class Declensor:
             reverse=True
         )
 
-    def _fitOrthography(self, word):
+    @staticmethod
+    def _fitOrthography(word):
         """Fix some orthography mistakes, which can happen after declension.
 
         Args:
@@ -303,7 +304,7 @@ class Declensor:
         if not model:
             raise NoModelFound("No appropriate model for this form found.")
 
-        return self._fitOrthography(
+        return Declensor._fitOrthography(
             self._changeProperties(word, *model, newmorph))
 
 
@@ -314,12 +315,18 @@ class NoModelFound(Exception):
 class DeclenseTrainer:
 
     GROUPS = [
-        list("мвнлрй"),
-        list("дзжгґб"),
-        list("птсцшчпкхф"),
-        list("аіуео"),
-        list("яїюєь"),
-        list("шчщс")
+        # мвнлрй
+        list("\u043c\u0432\u043d\u043b\u0440\u0439"),
+        # дзжгґб
+        list("\u0434\u0437\u0436\u0433\u0491\u0431"),
+        # птсцшчпкхф
+        list("\u043f\u0442\u0441\u0446\u0448\u0447\u043f\u043a\u0445\u0444"),
+        # аіуео
+        list("\u0430\u0456\u0443\u0435\u043e"),
+        # яїюєь
+        list("\u044f\u0457\u044e\u0454\u044c"),
+        # шчщс
+        list("\u0448\u0447\u0449\u0441")
     ]
 
     @staticmethod
@@ -472,7 +479,8 @@ class DeclenseTrainer:
                 """
                 for i, el in enumerate(array):
                     if type(el) is str:
-                        array[i] = el[:index] + l + el[index + 1:]
+                        array[i] = Declensor._fitOrthography(
+                            el[:index] + l + el[index + 1:])
                     else:
                         array[i] = _putRecursively(l, index, el)
                 return array
@@ -519,6 +527,7 @@ class DeclenseTrainer:
             given index.
             """
             if type(a) is type(b) is not list:
+                # This will omit the letter given by `index`
                 return a[:index] + a[index + 1:] == b[:index] + b[index + 1:]
 
             return all(
