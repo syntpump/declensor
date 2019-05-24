@@ -65,6 +65,8 @@ Suggested structure of noun model:
 
 """
 
+from copy import deepcopy
+
 
 class Declensor:
     """Declensor class take declension models and give you functions to
@@ -476,7 +478,7 @@ class DeclenseTrainer:
                 return array
 
             return [
-                _putRecursively(letter, index, rule[:])
+                _putRecursively(letter, index, deepcopy(rule))
                 for letter in group
             ]
 
@@ -498,14 +500,15 @@ class DeclenseTrainer:
             for rule in array:
                 try:
                     if (
-                        Declensor.getZero(rule)[index] not in group or
-                        not deleted or
-                        not _rulesAreIdentical(deleted, rule, index)
+                        Declensor.getZero(rule)[index] not in group or (
+                            deleted and
+                            not _rulesAreIdentical(deleted, rule, index)
+                        )
                     ):
                         result.append(rule)
-                        counter += 1
                     else:
                         deleted = rule
+                        counter += 1
                 except IndexError:
                     continue
 
