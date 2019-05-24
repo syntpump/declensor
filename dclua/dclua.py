@@ -368,7 +368,7 @@ class DeclenseTrainer:
 
     @staticmethod
     def analyze(declensions, minsize=2):
-        """Produce the declension model for given word.
+        """Produce the declension rule for given word.
 
         Args:
             declensions (dict):
@@ -378,7 +378,7 @@ class DeclenseTrainer:
             minsize (int): Minimal size of the suffix.
 
         Returns:
-            list: Produced model.
+            list: Produced rule.
 
         """
 
@@ -416,12 +416,12 @@ class DeclenseTrainer:
             if diff > 0:
                 rootSize -= diff
 
-        model = list()
+        rule = list()
 
         for vector, form in declensions.items():
-            _insertInto(model, form[rootSize:], *vector)
+            _insertInto(rule, form[rootSize:], *vector)
 
-        return model
+        return rule
 
     @staticmethod
     def createModel(words, minsize=2):
